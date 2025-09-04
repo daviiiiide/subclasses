@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow import keras
 from keras.callbacks import Callback
 from keras.models import Sequential
-from keras.layers import Flatten, Dense
+from keras.layers import Flatten, Dense, Input
 from sklearn.model_selection import train_test_split
 import keras.backend as K
 
@@ -28,14 +28,13 @@ def load_kmnist():
         with urllib.request.urlopen(url) as response:
             with gzip.GzipFile(fileobj=BytesIO(response.read())) as f:
                 if is_image:
-                    f.read(16)  # Skip header
+                    f.read(16)  # skip header
                     data = np.frombuffer(f.read(), dtype=np.uint8)
                     return data.reshape(n_samples, 28, 28)
                 else:
-                    f.read(8)  # Skip header
+                    f.read(8) 
                     return np.frombuffer(f.read(), dtype=np.uint8)
     
-    # Download all data
     X_train = download_and_parse(base_url + files["train_images"], True, 60000)
     y_train = download_and_parse(base_url + files["train_labels"], False)
     X_test = download_and_parse(base_url + files["test_images"], True, 10000)
@@ -165,7 +164,8 @@ def run_experiment(lay1, size, bs_coarse, decay_rate, ep_of_diminish, lr1, ep_co
     Y_test_coarse_cat = keras.utils.to_categorical(Y_test_coarse, 2)
     
     model_coarse = Sequential([
-        Flatten(input_shape=shape),
+        Input(shape=shape),
+        Flatten(),
         Dense(lay1, activation='tanh', kernel_initializer='glorot_uniform', bias_initializer='zeros'),
         Dense(2, activation='softmax')
     ])
@@ -203,7 +203,8 @@ def run_experiment(lay1, size, bs_coarse, decay_rate, ep_of_diminish, lr1, ep_co
     Y_test_fine_cat = keras.utils.to_categorical(Y_test_fine, n_classes_fine)
     
     model_fine = Sequential([
-        Flatten(input_shape=shape),
+        Input(shape=shape),
+        Flatten(),
         Dense(lay1, activation='tanh', kernel_initializer='glorot_uniform', bias_initializer='zeros'),
         Dense(n_classes_fine, activation='softmax')
     ])
